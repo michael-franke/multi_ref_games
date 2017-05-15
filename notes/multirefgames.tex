@@ -1,0 +1,267 @@
+\documentclass[fleqn,reqno,12pt]{article}
+
+\usepackage{myarticlestyledefault}
+
+\usepackage[margin = 3.5cm]{geometry}
+
+\definecolor{Red}{RGB}{178,34,34}
+\newcommand{\optional}[1]{\textcolor{Red}{[\textbf{alternative option}: #1]}} 
+
+\title{Meaning evolution in multiple reference games with pragmatic language users}
+\author{Michael Franke}
+\date{}
+
+\usepackage[T1]{fontenc}
+\usepackage{fontspec,xltxtra}
+\setromanfont[Mapping=tex-text]{Baskerville}
+
+\newcommand{\word}{\ensuremath{w}}
+
+\begin{document}
+\maketitle
+
+\section{Motivation}
+
+Standard game theoretic models of meaning evolution assume a single fixed \emph{stage
+  game}. What evolves are agents' strategies (ways of behaving) in that particular game. For
+example, we might consider a single signaling game with particular payoffs and ask what its
+equilibria are or which outcomes are frequently observed under a particular learning dynamic
+\citep{Skyrms2010:Signals,HutteggerZollman2011:Signaling-Games}. The meaning of a signal can be
+traced to rational or evolved behavioral patterns in the stage game
+\citep{Lewis_1969:Convention,Hutteger:2007_Evol_Indicatives_Imperatives,Skyrms2010_Flow}.
+
+The picture pursued here differs from the above in several respects. Firstly, we assume not
+just one fixed stage game and (the rationality or evolution of) a single behavioral profile for
+it, but an open ended class of games, called the \emph{environment}, and (the rationality or
+evolution of) more general \emph{choice mechanisms} for playing any game from that class
+\citep{FawcettHamblin2013:Exposing-the-be,McNamara2013:Towards-a-Riche,FrankeGaleazzi2014:On-the-Evolutio,GaleazziFranke2016:Smart-Transform}. We
+are then particularly interested in how different statistical properties of the environment
+(the probability with which particular games are played) influences the evolution of
+language. Secondly, we will look at a richer picture of the agents' decision making, inspired
+by recent theoretically driven and empirically supported probabilistic models of language use
+\citep{FrankGoodman2012:Predicting-Prag,FrankeJager2015:Probabilistic-p,GoodmanFrank2016:Pragmatic-Langu}. Concretely,
+we assume that agents have a mental lexicon, which contains their subjective belief about
+lexical meanings, and that agents' language use in context is a function of pragmatic reasoning
+on top of this conventional meaning. We are then interested in how lexical representations
+evolve, when used pragmatically in a wide range of possible contexts. This is inspired by
+\citet{BrochhagenFranke2017:Co-evolution-of}, but differs in that we here do not focus on the
+evolution of pragmatic reasoning strategies and instead consider not a stage game but a rich
+multi-game environment. Finally, while a large chunk of the game theoretic literature on
+meaning evolution focuses on signaling games, we here consider \emph{reference games}
+\citep{Franke2012:Scales-Salience,Franke2012:On-Scales-Salie}.
+
+\section{The environment: Multiple reference games}
+\label{sec:mult-refer-games}
+
+\begin{itemize}
+\item The \textbf{environment} $E$ consists of an infinite set $\mathcal{G}$ of different
+  games, with a probability measure $P_E \in \Delta(\mathcal{G})$ such that $P_E(g)$ is the
+  frequency or probability with which any agent would play game $g \in \mathcal{G}$.
+  \begin{itemize}
+  \item The probability measure $P_E$ will be defined in terms of a number of parameters, to be
+    introduced in the following and summarized at the end of this section.
+  \end{itemize}
+\item We assume that all games in $\mathcal{G}$ are reference games.
+  \begin{itemize}
+  \item \optional{Consider another type of game and mixtures of several game types (like in \citet{Franke2012:Scales-Salience}).}
+  \end{itemize}
+\item A single \textbf{reference game} is a tuple $g = \tuple{o_1, \dots, o_k}$ of $k \ge 2$
+  objects. 
+  \begin{itemize}
+  \item The first object $o_1$ is called the designated object, the designated referent or the
+    target object/referent.
+    \begin{itemize}
+    \item The speaker tries to refer to $o_1$; the listener guesses the referent in $g$;
+      communication is successful if the listener guesses the correct referent.
+    \end{itemize}
+  \item The number $k$ of objects varies between games.
+    \begin{itemize}
+    \item E.g., an environment $E$ could differ from an environment $E'$ in that the expected
+      number of objects in $E$ is higher than that in $E'$. --- What would that mean for an
+      evolving language in $E$ and $E'$?
+    \end{itemize}
+  \end{itemize}
+\item An \textbf{object} $o \in \mathcal{F}^n$ is an $n$-tuple of features from an
+  $n$-dimensional \textbf{feature space} $\mathcal{F}^n$.
+\item Each \textbf{feature} $f_i \in F_i \subseteq \mathbb{R}$ of object
+  $o = \tuple{f_1, \dots, f_n}$ is a value on a \textbf{property scale} $F_i$.
+  \begin{itemize}
+  \item \optional{The property scale $F_i$ could also include values ``NA''. A ball is
+    neither rich nor poor.}
+  \end{itemize}
+\item Notice that the environment fixes, via the prior on games $P_E$, which feature values
+    likely occur in which combinations. For simplicity, we can define priors from the ground
+    up, so to speak, based on an assumption of independence of each feature dimension and
+    objects in the environment. 
+    \begin{itemize}
+    \item \optional{Consider richer ``stochastically structured'' environments. E.g., consider
+        cases where the several feature dimensions are correlated.}
+    \end{itemize}
+\item There are three types of property scales. They differ in the shape of the probability
+  distribution from which feature values are sampled:
+  \begin{enumerate}
+  \item open scales: $f \sim \mathcal{N}(\theta_o)$ (with $\theta_o$ a parameter; see below)
+  \item half-open scales: $f \sim \text{Gamma}(\theta_h)$ (with $\theta_h$ a parameter; see below)
+  \item closed scales: $f \sim \text{Beta}(1,1)$
+  \end{enumerate}
+  \begin{itemize}
+  \item \optional{Consider categorical feature values $f \sim \text{Multinom}(\cdot)$,
+      ordinal feature values $f \sim \text{Pois}(\cdot)$ or combinations of all the former.}
+  \item \optional{Consider a space of objects with fixed features (individual-level categories)
+    and temporally variable features (stage-level categories).}
+  \end{itemize}
+\item An environment $E$ is then defined entirely by the following parameters:
+  \begin{enumerate}
+  \item $\lambda_k$ --- shape parameter of distribution of the size of reference games $k \sim \text{Pois}(\lambda_k) + 2$
+  \item $\theta_o$, $\theta_h$ --- the shape parameters of the open and half-open property scales
+  \end{enumerate}
+\item \optional{Consider reference games with only partial observations: e.g., some referents
+    are no visible to either speaker or listener; an extreme case of this is where the speaker
+    only observes $o_1$ and must reason, based on (partial) knowledge of $P_E$ or some
+    ``heuristic'', which other objects the receiver might see.}
+\item \optional{Consider noisy environments in which agents perceive each object only with some
+  imprecision.}
+\item \optional{Compare environments which differ with respect to the properties of $o_1$
+    compared to the other objects in each $g$. What if $o_1$ is always the most/least
+    surprising element (in some information-theoretic sense, given $P_E$)?}
+\end{itemize}
+
+\section{Language \& its users}
+\label{sec:language-users}
+
+The behavior of language users is a function of (i) their subjective representations of basic
+lexical meanings of words or expressions, (ii) the way in which basic messages can be combined
+to form expressions, and (iii) a pragmatic strategy of how to use expressions with a given
+semantics in a given context. The following looks at each component in turn.
+
+\subsection{Lexica \& word meaning}
+\label{sec:lexica--semantic}
+
+\begin{itemize}
+\item Agents have a \textbf{lexicon} $\mathcal{L}$ which pins down their subjective
+  representation of the conventional/lexical meaning of content words.
+\item We consider the case where there is an antonym pair for every feature/property
+  scale. E.g., if property scale $F_i$ encodes the vertical size of an object, then there are
+  two words, one word $\word_i^h$ for high values of $F_i$ (think: \emph{tall}) and
+  another word $\word_i^l$ for low values of $F_i$ (think: \emph{short}).
+  \begin{itemize}
+  \item \optional{The association of word meanings to feature dimensions, which is assumed to
+      be given here, could evolve from use. This way we could also look at the evolution of
+      category labels.}
+  \item \optional{The size of vocabulary could evolve, so as to see how many basic predicates
+      are most useful and still learnable. Having a compositional system (see below) might
+      eradicate a need for larger base-level vocabularies.}
+  \item \optional{Consider different systems with different vocabulary sets/sizes and ask
+      (dryly, theoretically) which system achieves a higher communicative success on average:
+      reason about which features to encode is most efficient (e.g., only open scales, closed
+      scales, mixture?).}
+  \end{itemize}
+\item A lexicon $\mathcal{L}$ associates each pair $\tuple{\word_i^h,\word_i^l}$ with a pair
+  of threshold values $\mathcal{L}(\word_i^{h/l}) = \theta_i^{h/l} \in F_i$. These threshold
+  values give the boundaries above/below which $\word_i^h$/$\word_i^l$ are true of values in
+  $F_i$.
+  \begin{itemize}
+  \item Intuitively, the threshold $\theta_i^{h/l}$ is the \emph{extensional meaning} of word
+    $\word_i^{h/l}$.
+    \begin{itemize}
+    \item \optional{Think of richer representations for lexical meanings; curves, intervals
+        etc.}
+    \item \optional{Context dependence could be part of the lexical representation (e.g., it might
+        matter for a threshold which class of objects a word applies to (a \emph{short building}
+        is likely taller than a \emph{tall man})). Think: lexical meaning of \emph{tall} is the
+      tallest $\theta_{\text{tall}} = \nicefrac{1}{3}$ of objects in a context.}
+    \end{itemize}
+  \end{itemize}
+\item A word $\word_i^{h}$ / $\word_i^{h}$ is true of object $o = \tuple{f_1, \dots, f_n}$ iff
+  $f_i \ge \theta_i^h$ / $f_i \le \theta_i^l$.
+\end{itemize}
+
+\subsection{Compositional messages}
+\label{sec:comp-mess}
+
+\begin{itemize}
+\item The \textbf{language} of an agent is a set of \textbf{messages}, which is defined by a
+  (probabilistic context-free) \textbf{grammar}.
+  \begin{itemize}
+  \item Each agent has his own grammar representation. Grammars need to be learned from
+    observation and compete with each other on a measure of communicative efficiency.
+  \end{itemize}
+\item The grammar defines well-formed descriptive DPs, which we interpret as possible
+  descriptions of the target object $o_1$.
+\item In the simplest case, which we explore first, the grammar is actually entirely trivial:
+  it only consists of a single lexical expansion rule $DP \rightarrow \word_i^{h/l}$, so that
+  the space of possible messages is just the space of (single) words.
+  \begin{itemize}
+  \item \optional{The slightly more complex case to consider next is where messages are
+      sequences of words. (Order could matter or not, depending on whether we define
+      incremental production and interpretation rules (see below).) Adding sequences of
+      messages is basically adding a conjunction rule to the grammar.}
+  \item \optional{Add conjunction and negation to the grammar. This gives interesting stuff
+      like \emph{neither tall nor not tall}.}
+  \item \optional{Add recursive inclusion of other DPs. (Makes sense for a more structured
+      world in which we could want to say stuff like \emph{the tall man next to the skinny kid
+        with the yellow shirt}).}
+  \end{itemize}
+\item The meaning of complex messages are defined as a compositional function of the lexical
+  meanings of elements included in them and the way they are combined. (In the usual and
+  obvious way for simple grammars: e.g. conjunction is just set-intersection.)
+  \begin{itemize}
+  \item This gives us a set-theoretic interpretation of each message $\messg$ in context $g$ as
+    $\den{\messg}^g = \set{o \in g \mid \text{$\messg$ is true of $o$}}$
+    the set of all objects in $g$ of which $\messg$ is true.
+  \end{itemize}
+
+\end{itemize}
+
+\subsection{Pragmatic language use}
+\label{sec:pragm-lang-use}
+
+\begin{itemize}
+\item We define a pair of probabilistic speaker and listener choice rules, in the spirit of the
+  Rational Speech Act model
+  \citep{FrankGoodman2012:Predicting-Prag,FrankeJager2015:Probabilistic-p,GoodmanFrank2016:Pragmatic-Langu}. 
+  \begin{align*}
+    P_{LL}(o \mid \messg, g, \mathcal{L}) & = P(o \mid \den{\messg}_{\mathcal{L}}^g) \\
+    P_{S}(\messg \mid o, g, \mathcal{L}) & \propto \expo(\lambda \log(P_{LL}(o \mid \messg, g,
+    \mathcal{L}))) \\
+    P_{L}(o \mid \messg, g, \mathcal{L}) & \propto P_E(o_1 = o \mid g) \ P_{S}(\messg \mid o, g, \mathcal{L})
+  \end{align*}
+
+\item The speaker rule refers to a \textbf{literal listener} who interprets every message
+  literally. Concretely, a literal listener chooses an object $o \in g$ with a probability
+  given by Bayes rule, based on their priors (here assumed flat) and the
+  (set-theoretic/denotational) meaning of messages.
+  \begin{itemize}
+  \item \optional{Non-trivial priors for the literal listener.}
+  \end{itemize}
+\item The speaker chooses expressions based on how likely they are to make a literal
+  listener pick the desired referent.
+  \begin{itemize}
+  \item \optional{Include a cost term or utterance prior to differentiate between, e.g.,
+      simple/short and complex/long messages.}
+  \end{itemize}
+\item The pragmatic listener uses Bayes rule to reason about which referent the speaker might
+  most likely have used. To begin with, we may assume that the prior $P_E(o_1 = o \mid g)$ is
+  again flat.
+  \begin{itemize}
+  \item \optional{Include a strategic prior derived from (partial) knowlege of $P_E$.}
+  \end{itemize}
+
+\end{itemize}
+
+
+\section{Evolutionary dynamics}
+\label{sec:evol-dynam}
+
+
+
+\printbibliography[heading=bibintoc]
+
+\end{document}
+
+
+%%% Local Variables: 
+%%% mode: LaTeX
+%%% TeX-PDF-mode: t
+%%% TeX-engine: luatex 
+%%% End:
