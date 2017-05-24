@@ -1,57 +1,55 @@
 # ENVIRONMENT
 
-#import scipy
+import scipy
+import numpy
+import itertools
 import Methods
 import Random
 
 #global variables (currently all default values)
-LAMBDA = 0
-THETA_O = 0
-THETA_H = 0
-THETA_C = 0
-N_O = 0
-N_H = 0
-N_C = 0
-list_of_features = []
-list_of_agents = []
+LAMBDA = 4
+THETA_O = [5,5] # shape parameters for a beta distribution; for open scales
+THETA_H = [0.95,1] # shape parameters for a beta distribution; for half-open scales
+THETA_C = [1,1] # shape parameters for a beta distribution; for closed scales
+N_O = 2
+N_H = 2
+N_C = 2
+list_of_features = [] # maybe not necessary?
+list_of_agents = []   # maybe not necessary?
 list_of_games = []
-number_of_objs = 0
-number_of_games = 0
-number_of_agents = 0
-agent_ID_count = 0
-feature_ID_count = 0
-feature_means = []
+number_of_games = 100
+number_of_objs = 0    # not necessary (sampled in for each context)
+number_of_agents = 0  # we don't actually have agents, strictly speaking
+agent_ID_count = 0    # see above
+feature_ID_count = 0  # ???
+feature_means = []    # ???
+
+## LEXICA:
+## for each property type (open, half-open, closed), we have two words (high and low)
+## examples:
+lexicon_1= numpy.array([[0.1,0.9],
+                       [0.3,0.7],
+                       [0.4,0.8]])
+lexicon_2= numpy.array([[0.3,0.4],
+                       [0.2,0.6],
+                       [0.4,0.6]])
+# TO DO: create the set of all possible lexica (using values 0, 0.1, ... 0.9, 1)
 
 #matrix to store lexicon x lexicon use/success values
-LEXICAL_MATRIX = [[[0,0] for x in range(number_of_agents)] for y in range(number_of_agents)]
+AVERAGE_UTIL_MATRIX = [[[0,0] for x in range(number_of_lexica)] for y in range(number_of_lexica)]
 
 #code
 for game in range(number_of_games):     #for every game create the right amount of certain features
-    list_of_objs =  []
-    obj_ID_count = 0
-    
-    #create NO features
-    for f in range(N_O):
-        list_of_features.append(Methods.createNOFeature(feature_ID_count))
-        feature_ID_count += 1
-    
-    #create NH features
-    for f in range(N_H):
-        list_of_features.append(Methods.createNHFeature(feature_ID_count))
-        feature_ID_count += 1
-        
-    #create NC features
-    for f in range(N_C):
-        list_of_features.append(Methods.createNCFeature(feature_ID_count))
-        feature_ID_count += 1
-    
-    #create an object with the features generated    
-    for obj in range(number_of_objs):
-        list_of_objs.append(Methods.createObj(obj_ID_count, list_of_features))
-        obj_ID_count += 1
-        
+    # sample number of objects in context
+    number_of_objects = numpy.random.poisson(LAMBDA,1)[0] + 2
+    # sample a context (by sampling features for each object
+    context = numpy.concatenate([numpy.random.beta(THETA_O[0], THETA_O[1], [number_of_objects, N_O]),
+                                 numpy.random.beta(THETA_H[0], THETA_H[1], [number_of_objects, N_H]),
+                                 numpy.random.beta(THETA_C[0], THETA_C[1], [number_of_objects, N_C])], axis = 1)
     #add the game to the list of games
-    list_of_games.append(list_of_objs)
+    list_of_games.append(context)
+
+## messed with the code up to here
 
 #create all agents and add them to a list    
 for agent in range(number_of_agents):
