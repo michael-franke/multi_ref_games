@@ -27,7 +27,7 @@ feature_means = []    # ???
 ## LEXICA:
 ## for each property type (open, half-open, closed), we have two words (high and low)
 ## examples:
-lexicon_1= numpy.array([[0.1,0.9],
+lexicon_1= numpy.array([[0.9,0.6],
                        [0.3,0.7],
                        [0.4,0.8]])
 lexicon_2= numpy.array([[0.3,0.4],
@@ -38,14 +38,19 @@ lexicon_2= numpy.array([[0.3,0.4],
 #matrix to store lexicon x lexicon use/success values
 AVERAGE_UTIL_MATRIX = [[[0,0] for x in range(number_of_lexica)] for y in range(number_of_lexica)]
 
-#code
-for game in range(number_of_games):     #for every game create the right amount of certain features
-    # sample number of objects in context
+def get_context():
     number_of_objects = numpy.random.poisson(LAMBDA,1)[0] + 2
     # sample a context (by sampling features for each object
     context = numpy.concatenate([numpy.random.beta(THETA_O[0], THETA_O[1], [number_of_objects, N_O]),
                                  numpy.random.beta(THETA_H[0], THETA_H[1], [number_of_objects, N_H]),
                                  numpy.random.beta(THETA_C[0], THETA_C[1], [number_of_objects, N_C])], axis = 1)
+    return context
+
+
+
+#code
+for game in range(number_of_games):     #for every game create the right amount of certain features
+    context = get_context()
     #add the game to the list of games
     list_of_games.append(context)
 
@@ -89,3 +94,17 @@ new_use_succ = [selected_agent_use_succ[0] + 1, selected_agent_use_succ[1] + suc
 #assign the new values to the matrix
 LEXICAL_MATRIX[selected_agent.ID][listening_agent.ID] = new_use_succ
  
+
+### pseudo
+
+def normalize(m):
+    m = m / m.sum(axis=1)[:, np.newaxis]
+    m[np.isnan(m)] = 0.
+    return m
+
+def speaker_choice(g, L, lambda ):
+    semantics = [[ truth-value of whether m is true of o given L for m in M] for o in g]
+    literal_listener = normalize(numpy.transpose(semantics))
+    choice_probability = numpy.exp(lambda * literal_listener[:][0])
+    choice_probability = choice_probability / numpy.sum(choice_probability)
+    return (choice_probability)
