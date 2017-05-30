@@ -1,9 +1,7 @@
 # ENVIRONMENT
 
-import scipy
 import numpy
 import itertools
-import Methods
 import Random
 
 #global variables (currently all default values)
@@ -14,29 +12,11 @@ THETA_C = [1,1] # shape parameters for a beta distribution; for closed scales
 N_O = 2
 N_H = 2
 N_C = 2
-list_of_features = [] # maybe not necessary?
-list_of_agents = []   # maybe not necessary?
+list_of_lexica = []
 list_of_games = []
 number_of_games = 100
-number_of_objs = 0    # not necessary (sampled in for each context)
-number_of_agents = 0  # we don't actually have agents, strictly speaking
-agent_ID_count = 0    # see above
-feature_ID_count = 0  # ???
-feature_means = []    # ???
+number_of_lexica = 0
 
-## LEXICA:
-## for each property type (open, half-open, closed), we have two words (high and low)
-## examples:
-lexicon_1= numpy.array([[0.9,0.6],
-                       [0.3,0.7],
-                       [0.4,0.8]])
-lexicon_2= numpy.array([[0.3,0.4],
-                       [0.2,0.6],
-                       [0.4,0.6]])
-# TO DO: create the set of all possible lexica (using values 0, 0.1, ... 0.9, 1)
-
-#matrix to store lexicon x lexicon use/success values
-AVERAGE_UTIL_MATRIX = [[[0,0] for x in range(number_of_lexica)] for y in range(number_of_lexica)]
 
 def get_context():
     number_of_objects = numpy.random.poisson(LAMBDA,1)[0] + 2
@@ -45,6 +25,92 @@ def get_context():
                                  numpy.random.beta(THETA_H[0], THETA_H[1], [number_of_objects, N_H]),
                                  numpy.random.beta(THETA_C[0], THETA_C[1], [number_of_objects, N_C])], axis = 1)
     return context
+ 
+
+
+def get_lexica():
+    all_lexica = []
+    o = []
+    h = []
+    c = []
+    
+    for o_x in range(0.0, 1.0, 0.1):
+        for o_y in range(0.0, 1.0, 0.1):
+            o = [o_x,o_y]
+            for h_x in range(0.0, 1.0, 0.1):
+                for h_y in range(0.0, 1.0, 0.1):
+                    h = [h_x, h_y]
+                    for c_x in range(0.0, 1.0, 0.1):
+                        for c_y in range(0.0, 1.0, 0.1):
+                            c = [c_x, c_y]
+                            features = [o,h,c]
+                            all_lexica.append(features)
+                            
+    return all_lexica
+
+
+
+             
+### pseudo
+
+def normalize(m):
+    m = m / m.sum(axis=1)[:, numpy.newaxis]
+    m[numpy.isnan(m)] = 0.
+    return m
+
+def speaker_choice(g, L):
+    semantics = [[[-1,-1] for features in range(len(g[0]))] for objs in range(len(g))]
+    cell = []
+    low = -1
+    high = -1
+    lexicon_count = 0
+    
+    for i in range(len(g)):
+        g_obj = g[i]
+        for j in range(len(g_obj)):
+            g_feature = g_obj[j]
+            L_feature = L[lexicon_count]
+            if (L_feature < g_feature[0]):
+                low = 1
+            else:
+                low = 0
+                
+            if(L_feature > g_feature[0]):
+                high = 1
+            else:
+                high = 0
+                
+            cell = [low,high]
+            semantics[i][j] = cell
+            lexicon_count += 1
+    
+    
+    
+    
+    #semantics = [[ truth-value of whether m is true of o given L for m in M] for o in g]
+    literal_listener = normalize(numpy.transpose(semantics))
+    choice_probability = numpy.exp(LAMBDA * literal_listener[:,0])
+    choice_probability = choice_probability / numpy.sum(choice_probability)
+    
+    return (choice_probability)
+## LEXICA:
+## for each property type (open, half-open, closed), we have two words (high and low)
+## examples:
+#lexicon_1= numpy.array([[0.9,0.6],
+#                       [0.3,0.7],
+#                       [0.4,0.8]])
+#lexicon_2= numpy.array([[0.3,0.4],
+#                       [0.2,0.6],
+#                       [0.4,0.6]])
+# TO DO: create the set of all possible lexica (using values 0, 0.1, ... 0.9, 1)
+list_of_lexica = get_lexica()
+
+
+
+#matrix to store lexicon x lexicon use/success values
+AVERAGE_UTIL_MATRIX = [[[0,0] for x in range(number_of_lexica)] for y in range(number_of_lexica)]
+
+
 
 
 
@@ -54,57 +120,7 @@ for game in range(number_of_games):     #for every game create the right amount 
     #add the game to the list of games
     list_of_games.append(context)
 
-## messed with the code up to here
+  
 
-#create all agents and add them to a list    
-for agent in range(number_of_agents):
-    list_of_agents.append(Methods.createAgent(agent_ID_count, list_of_features))
-    agent_ID_count += 1    
-    
-#randomly select an agent
-selected_agent = Random.choice(list_of_agents)
-
-#randomly select a game
-selected_game = Random.choice(list_of_games)
-
-#randomly select an object
-selected_object = Random.choice(selected_game)
-
-#randomly select a feature
-selected_feature = Random.choice(selected_object.features)
-
-#randomly select a listening agent
-listening_agent = Random.choice(list_of_agents)
-
-
-#.......
-
-#assign success value (1 if successful, 0 if not)
-if (successful):
-    succ_pt = 1
-else:
-    succ_pt = 0
-    
-#get the current use_success values
-selected_agent_use_succ = LEXICAL_MATRIX[selected_agent.ID][listening_agent.ID]
-
-#create a new use_success list increasing the use by 1 and success by 1 if successful
-new_use_succ = [selected_agent_use_succ[0] + 1, selected_agent_use_succ[1] + succ_pt]
-
-#assign the new values to the matrix
-LEXICAL_MATRIX[selected_agent.ID][listening_agent.ID] = new_use_succ
- 
-
-### pseudo
-
-def normalize(m):
-    m = m / m.sum(axis=1)[:, np.newaxis]
-    m[np.isnan(m)] = 0.
-    return m
-
-def speaker_choice(g, L, lambda ):
-    semantics = [[ truth-value of whether m is true of o given L for m in M] for o in g]
-    literal_listener = normalize(numpy.transpose(semantics))
-    choice_probability = numpy.exp(lambda * literal_listener[:][0])
-    choice_probability = choice_probability / numpy.sum(choice_probability)
-    return (choice_probability)
+g = Random.choice(list_of_games)
+Lj = Random.choice(list_of_lexica)
