@@ -51,7 +51,7 @@ def get_lexica():
 #    m[numpy.isnan(m)] = 0.
 #    return m
 
-def speaker_choice(g, L):
+def semantics(g, L):
     #print("len(g): ", len(g))
     #print("leng0: ", len(g[0]))
     semantics = [[-1 for features in range(2 * len(g[0]))] for objs in range(len(g))]
@@ -210,24 +210,24 @@ def printGames():
     print(string)
 
 
-def printSC(sc):
+def printSem(sem):
     string = "=====================================================================================================\n"
-    string += "SPEAKER_CHOICE\n"
+    string += "SEMANTICS\n"
     string += "Object\t"
     
-    for features in range(len(sc[0])):
+    for features in range(len(sem[0])):
         string += "| f_val"
         string += str(features)
         
     string += "\n---------------------------------------------------------------------------------------------------\n"
     
-    for objIdx in range(len(sc)):
+    for objIdx in range(len(sem)):
         string += "Object"
         string += str(objIdx)
         string += "\t"
-        for valueIdx in range(len(sc[objIdx])):
+        for valueIdx in range(len(sem[objIdx])):
             string += "| "
-            string += str(sc[objIdx][valueIdx])
+            string += str(sem[objIdx][valueIdx])
             string += "\t"
         string += "\n"
         
@@ -324,16 +324,16 @@ g = random.choice(list_of_games)
 Lj = random.choice(list_of_lexica)
 #print("Lj: ", Lj)
     
-speakerChoice = speaker_choice(g, Lj)
-literal_listener = [[-1 for features in range(len(speakerChoice))] for objs in range(len(speakerChoice[0]))]
-choice_probability = normalise(speakerChoice)
+semantics = semantics(g, Lj)
+literal_listener = [[-1 for features in range(len(semantics))] for objs in range(len(semantics[0]))]
+choice_probability = normalise(semantics) #SPEAKER CHOICE
 
 #print("speakerChoice: ", speakerChoice)
 #print("choice_probability: ", choice_probability)    
 
 printLexica()
 printGames()
-printSC(speakerChoice)
+printSem(semantics)
 printLL(literal_listener)
 printCP(choice_probability)
 
