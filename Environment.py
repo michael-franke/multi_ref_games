@@ -2,7 +2,7 @@
 
 import numpy
 import random
-import time
+#import time
 
 #global variables (currently all default values)
 LAMBDA = 4
@@ -21,7 +21,7 @@ number_of_objects = -1
 def get_context():
     number_of_objects = numpy.random.poisson(LAMBDA,1)[0] + 2
     # sample a context (by sampling features for each object
-    print("number of objects: ", number_of_objects)
+    #print("number of objects: ", number_of_objects)
     context = numpy.concatenate([numpy.random.beta(THETA_O[0], THETA_O[1], [number_of_objects, N_O]),
                                  numpy.random.beta(THETA_H[0], THETA_H[1], [number_of_objects, N_H]),
                                  numpy.random.beta(THETA_C[0], THETA_C[1], [number_of_objects, N_C])], axis = 1)
@@ -118,18 +118,20 @@ def normalise(speakerChoice):
 
     shared_value = 0
     feature_values = []
-    print("speakerchoice: ", len(speakerChoice))
-    print("speakerchoice0: ", len(speakerChoice[0]))
-    literal_listener = [[-1 for features in range(len(speakerChoice))] for objs in range(len(speakerChoice[0]))]
-    #print("Llistener: ", literal_listener)
+    #print("speakerchoice: ", len(speakerChoice))
+    #print("speakerchoice0: ", len(speakerChoice[0]))
+#print("Llistener: ", literal_listener)
     for i in range(len(speakerChoice[0])):
         true_count = []
         for j in range(len(speakerChoice)):
             true_count.append(speakerChoice[j][i])
-        print("true_count: ", true_count)
-        shared_value = 1.0 / numpy.sum(true_count)
+        #print("true_count: ", true_count)
+        if numpy.sum(true_count) == 0.0:
+            shared_value = 1.0
+        else:
+            shared_value = 1.0 / numpy.sum(true_count)
         feature_values.append(shared_value)
-        print("feature_values: ", feature_values)
+        #print("feature_values: ", feature_values)
 
     for i in range(len(speakerChoice[0])):
         for j in range(len(speakerChoice)):
@@ -144,14 +146,15 @@ def normalise(speakerChoice):
             for k in range(len(literal_listener[i])):
                 literal_listener[i][k]= 1.0 / len(literal_listener[i])
             #print(literal_listener[i])
-    print("literal_L: ", literal_listener)     
+    #print("literal_L: ", literal_listener)     
+    choice_probability = []
     
     for j in range(len(literal_listener)):
         x = numpy.array(literal_listener[j])
-        print("x: ", x)
+        #print("x: ", x)
         y = numpy.exp(LAMBDA * x)
-        print("y: ", y)
-        choice_probability = y / numpy.sum(y)
+        #print("y: ", y)
+        choice_probability.append(y / numpy.sum(y))
 
     
            
@@ -161,6 +164,131 @@ def normalise(speakerChoice):
     #choice_probability = choice_probability / numpy.sum(choice_probability)
     
     return choice_probability
+
+
+def printLexica():
+    print("==========================")
+    print("LEXICA")
+    
+    for lexica in list_of_lexica:
+        print("\t| low \t| high")
+        print("--------------------------")
+        print("Open\t| ", lexica[0][0], "| ", lexica[0][1])
+        print("Half\t| ", lexica[1][0], "| ", lexica[1][1])
+        print("Closed\t| ", lexica[2][0], "| ", lexica[2][1])
+        print("==========================")
+        print()
+
+def printGames():
+    string = "===================================================================================================================\n"
+    string += "GAMES\n"
+    
+    for gameIdx in range(len(list_of_games)):
+        string += "Game\t| Object\t"
+        for features in range(len(list_of_games[gameIdx][0])):
+            string += "| value "
+            string += str(features)
+            string += "\t "
+        
+        string += "--------------------------------------------------------------------------------------------------------------------\n"
+        
+    
+        string += "Game"
+        string += str(gameIdx)
+        for objIdx in range(len(list_of_games[gameIdx])):
+            string += "\t| Object"
+            string += str(objIdx)
+            string += "\t"
+            for features in range(len(list_of_games[gameIdx][objIdx])):
+                string += "| "
+                string += str(list_of_games[gameIdx][objIdx][features])[:5]
+                string += "\t\t"
+            
+            string += "\n"
+        string += "====================================================================================================================\n"
+
+    print(string)
+
+
+def printSC(sc):
+    string = "=====================================================================================================\n"
+    string += "SPEAKER_CHOICE\n"
+    string += "Object\t"
+    
+    for features in range(len(sc[0])):
+        string += "| f_val"
+        string += str(features)
+        
+    string += "\n---------------------------------------------------------------------------------------------------\n"
+    
+    for objIdx in range(len(sc)):
+        string += "Object"
+        string += str(objIdx)
+        string += "\t"
+        for valueIdx in range(len(sc[objIdx])):
+            string += "| "
+            string += str(sc[objIdx][valueIdx])
+            string += "\t"
+        string += "\n"
+        
+    string += "=====================================================================================================\n"
+    
+    print(string)
+
+
+def printCP(cp):
+    string = "=======================================================================\n"
+    string += "CHOICE_PROBABILITY\n"
+    string += "feature\t"
+    
+    for featIdx in range(len(cp[0])):
+        string += "| Obj"
+        string += str(featIdx)
+        string += "\t"
+    
+    string += "\n--------------------------------------------------------------------\n"     
+    
+    for featIdx in range(len(cp)):
+        string += "f_"
+        string += str(featIdx)
+        string += "\t"
+        
+        for objIdx in range(len(cp[featIdx])):
+            string += "| "
+            string += str(cp[featIdx][objIdx])[:5]
+            string += "\t"
+        string += "\n"
+        
+    string += "====================================================================\n"
+    
+    print(string)
+    
+    
+def printLL(ll):
+    string = "=======================================================================\n"
+    string += "LITERAL_LISTENER\n"
+    string += "feature\t"
+    for featIdx in range(len(ll[0])):
+        string += "| Obj"
+        string += str(featIdx)
+        string += "\t"
+    
+    string += "\n--------------------------------------------------------------------\n"     
+    
+    for featIdx in range(len(ll)):
+        string += "f_"
+        string += str(featIdx)
+        string += "\t"
+        
+        for objIdx in range(len(ll[featIdx])):
+            string += "| "
+            string += str(ll[featIdx][objIdx])[:5]
+            string += "\t"
+        string += "\n"
+        
+    string += "====================================================================\n"
+    
+    print(string)
 ## LEXICA:
 ## for each property type (open, half-open, closed), we have two words (high and low)
 ## examples:
@@ -172,12 +300,12 @@ def normalise(speakerChoice):
 #                       [0.4,0.6]])
 # TO DO: create the set of all possible lexica (using values 0, 0.1, ... 0.9, 1)
 list_of_lexica = get_lexica()
-print("lexica: ", list_of_lexica)
-
+#print("lexica: ", list_of_lexica)
+    
 
 #matrix to store lexicon x lexicon use/success values
 AVERAGE_UTIL_MATRIX = [[[0,0] for x in range(number_of_lexica)] for y in range(number_of_lexica)]
-print("AVERAGE_UTIL_MATRIX: ", AVERAGE_UTIL_MATRIX)
+#print("AVERAGE_UTIL_MATRIX: ", AVERAGE_UTIL_MATRIX)
 
 
 
@@ -188,16 +316,26 @@ for game in range(number_of_games):     #for every game create the right amount 
     #add the game to the list of games
     list_of_games.append(context)
 
-print("list of games: ", list_of_games[0])  
+#print("list of games: ", list_of_games[0])  
 
 g = random.choice(list_of_games)
-print("g: ", g)
+#print("g: ", g)
 
 Lj = random.choice(list_of_lexica)
-print("Lj: ", Lj)
+#print("Lj: ", Lj)
     
 speakerChoice = speaker_choice(g, Lj)
+literal_listener = [[-1 for features in range(len(speakerChoice))] for objs in range(len(speakerChoice[0]))]
 choice_probability = normalise(speakerChoice)
 
 #print("speakerChoice: ", speakerChoice)
-print("choice_probability: ", choice_probability)    
+#print("choice_probability: ", choice_probability)    
+
+printLexica()
+printGames()
+printSC(speakerChoice)
+printLL(literal_listener)
+printCP(choice_probability)
+
+
+
