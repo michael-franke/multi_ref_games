@@ -46,10 +46,7 @@ def get_lexica():
                             
     return all_lexica
 
-#def normalize(m): #check this
-#    m = m / m.sum(axis=1)[:, numpy.newaxis]
-#    m[numpy.isnan(m)] = 0.
-#    return m
+
 
 def semantics(g, L):
     #print("len(g): ", len(g))
@@ -336,6 +333,36 @@ printGames()
 printSem(semantics)
 printLL(literal_listener)
 printCP(choice_probability)
+
+
+## Micha version:
+
+def normalize(m):
+    m = numpy.float128(m) # not sure if this is smart (is there a function to check level of precision?)
+    m = m / m.sum(axis=1)[:, numpy.newaxis]
+    m[numpy.isnan(m)] = 1.0/len(m[0])
+    return m
+
+# literal listener:
+# transpose semantics, then normalize
+literal_listener = normalize(numpy.transpose(semantics))
+printLL(literal_listener)
+
+# pragmatic speaker
+# define a rationality parameter
+# transpose literal listener, then multiply, then exponentiate, then normalize
+l = 15
+speaker_choice = normalize(numpy.exp(l * numpy.transpose(literal_listener)))
+
+print(speaker_choice)
+printCP(speaker_choice) # print method not working properly
+# ideally: rows are objects and columns are messages
+
+# pragmatic listener
+# transpose pragmatic speaker, then normalize
+listener_choice = normalize(numpy.transpose(speaker_choice))
+
+
 
 
 
