@@ -46,7 +46,10 @@ def get_lexica():
                             
     return all_lexica
 
-
+#def normalize(m): #check this
+#    m = m / m.sum(axis=1)[:, numpy.newaxis]
+#    m[numpy.isnan(m)] = 0.
+#    return m
 
 def semantics(g, L):
     #print("len(g): ", len(g))
@@ -111,56 +114,11 @@ def semantics(g, L):
     return semantics
  
 def normalise(speakerChoice):
+    m = numpy.longdouble(speakerChoice)
+    m = m / m.sum(axis=1)[:, numpy.newaxis]
+    m[numpy.isnan(m)] = 1.0/len(m[0])
     
-
-    shared_value = 0
-    feature_values = []
-    #print("speakerchoice: ", len(speakerChoice))
-    #print("speakerchoice0: ", len(speakerChoice[0]))
-#print("Llistener: ", literal_listener)
-    for i in range(len(speakerChoice[0])):
-        true_count = []
-        for j in range(len(speakerChoice)):
-            true_count.append(speakerChoice[j][i])
-        #print("true_count: ", true_count)
-        if numpy.sum(true_count) == 0.0:
-            shared_value = 1.0
-        else:
-            shared_value = 1.0 / numpy.sum(true_count)
-        feature_values.append(shared_value)
-        #print("feature_values: ", feature_values)
-
-    for i in range(len(speakerChoice[0])):
-        for j in range(len(speakerChoice)):
-            if speakerChoice[j][i] == 1:
-                literal_listener[i][j] = feature_values[i]
-            else:
-                literal_listener[i][j] = 0
-    
-    for i in range(len(literal_listener)):
-        if numpy.sum(literal_listener[i]) == 0:
-            #print("triggered", i)
-            for k in range(len(literal_listener[i])):
-                literal_listener[i][k]= 1.0 / len(literal_listener[i])
-            #print(literal_listener[i])
-    #print("literal_L: ", literal_listener)     
-    choice_probability = []
-    
-    for j in range(len(literal_listener)):
-        x = numpy.array(literal_listener[j])
-        #print("x: ", x)
-        y = numpy.exp(LAMBDA * x)
-        #print("y: ", y)
-        choice_probability.append(y / numpy.sum(y))
-
-    
-           
-    #semantics = [[ truth-value of whether m is true of o given L for m in M] for o in g]
-    #literal_listener = normalize(numpy.transpose(semantics))
-    #choice_probability = numpy.exp(LAMBDA * literal_listener[:,0])
-    #choice_probability = choice_probability / numpy.sum(choice_probability)
-    
-    return choice_probability
+    return m
 
 
 def printLexica():
@@ -212,9 +170,14 @@ def printSem(sem):
     string += "SEMANTICS\n"
     string += "Object\t"
     
-    for features in range(len(sem[0])):
-        string += "| f_val"
-        string += str(features)
+    for features in range(0,len(sem[0]),2):
+        string += "| f_"
+        string += str(int(features/2))
+        string += "\t\t"
+    string += "\n\t"
+    
+    for messages in range(0,len(sem[0]),2):
+        string += "| low\t| high\t"
         
     string += "\n---------------------------------------------------------------------------------------------------\n"
     
@@ -233,26 +196,34 @@ def printSem(sem):
     print(string)
 
 
-def printCP(cp):
+def printCP(which, cp):
+    #cp = numpy.transpose(cp)
+    print(cp, len(cp), len(cp[0]))
+    
     string = "=======================================================================\n"
-    string += "CHOICE_PROBABILITY\n"
-    string += "feature\t"
+    string += "CHOICE_PROBABILITY: "
+    string += which
+    string += "\nObject\t"
     
-    for featIdx in range(len(cp[0])):
-        string += "| Obj"
-        string += str(featIdx)
-        string += "\t"
+    for featIdx in range(0,len(cp[0]),2):
+        string += "| f_"
+        string += str(int(featIdx/2))
+        string += "\t\t"
+    string += "\n\t"
     
+    for messages in range(0,len(cp[0]),2):
+        string += "| low\t| high\t"
+        
     string += "\n--------------------------------------------------------------------\n"     
     
-    for featIdx in range(len(cp)):
-        string += "f_"
-        string += str(featIdx)
+    for objIdx in range(len(cp)):
+        string += "obj_"
+        string += str(objIdx)
         string += "\t"
         
-        for objIdx in range(len(cp[featIdx])):
+        for featIdx in range(len(cp[objIdx])):
             string += "| "
-            string += str(cp[featIdx][objIdx])[:5]
+            string += str(cp[objIdx][featIdx])[:5]
             string += "\t"
         string += "\n"
         
@@ -264,7 +235,7 @@ def printCP(cp):
 def printLL(ll):
     string = "=======================================================================\n"
     string += "LITERAL_LISTENER\n"
-    string += "feature\t"
+    string += "feature\t| message\t"
     for featIdx in range(len(ll[0])):
         string += "| Obj"
         string += str(featIdx)
@@ -272,9 +243,17 @@ def printLL(ll):
     
     string += "\n--------------------------------------------------------------------\n"     
     
+    messageCount = 0
+    
     for featIdx in range(len(ll)):
-        string += "f_"
-        string += str(featIdx)
+        if messageCount == 2:
+            messageCount = 0
+        if featIdx % 2 == 0:
+            string += "f_"
+            string += str(int(featIdx/2))
+        string += "\t| mess_"
+        string += str(messageCount)
+        messageCount += 1
         string += "\t"
         
         for objIdx in range(len(ll[featIdx])):
@@ -282,6 +261,8 @@ def printLL(ll):
             string += str(ll[featIdx][objIdx])[:5]
             string += "\t"
         string += "\n"
+        
+        
         
     string += "====================================================================\n"
     
@@ -320,49 +301,18 @@ g = random.choice(list_of_games)
 
 Lj = random.choice(list_of_lexica)
 #print("Lj: ", Lj)
-    
-semantics = semantics(g, Lj)
-literal_listener = [[-1 for features in range(len(semantics))] for objs in range(len(semantics[0]))]
-choice_probability = normalise(semantics) #SPEAKER CHOICE
-
-#print("speakerChoice: ", speakerChoice)
-#print("choice_probability: ", choice_probability)    
 
 printLexica()
-printGames()
+printGames()    
+
+semantics = semantics(g, Lj)
 printSem(semantics)
-printLL(literal_listener)
-printCP(choice_probability)
 
-
-## Micha version:
-
-def normalize(m):
-    m = numpy.float128(m) # not sure if this is smart (is there a function to check level of precision?)
-    m = m / m.sum(axis=1)[:, numpy.newaxis]
-    m[numpy.isnan(m)] = 1.0/len(m[0])
-    return m
-
-# literal listener:
-# transpose semantics, then normalize
-literal_listener = normalize(numpy.transpose(semantics))
+literal_listener = normalise(numpy.transpose(semantics))
 printLL(literal_listener)
 
-# pragmatic speaker
-# define a rationality parameter
-# transpose literal listener, then multiply, then exponentiate, then normalize
-l = 15
-speaker_choice = normalize(numpy.exp(l * numpy.transpose(literal_listener)))
+speaker_choice = normalise(numpy.exp(LAMBDA * numpy.transpose(literal_listener)))
+printCP("speaker_choice", speaker_choice)
 
-print(speaker_choice)
-printCP(speaker_choice) # print method not working properly
-# ideally: rows are objects and columns are messages
-
-# pragmatic listener
-# transpose pragmatic speaker, then normalize
-listener_choice = normalize(numpy.transpose(speaker_choice))
-
-
-
-
-
+listener_choice = normalise(numpy.transpose(speaker_choice))
+printCP("listener_choice", numpy.transpose(listener_choice))
