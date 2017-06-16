@@ -29,7 +29,7 @@ def get_context():
  
 
 
-def get_lexica():
+def get_lexica(stepsize = 1.0/3):
     all_lexica = []
     o1 = [0.9,0.6]       
     h1 = [0.3,0.7]
@@ -316,3 +316,36 @@ printCP("speaker_choice", speaker_choice)
 
 listener_choice = normalise(numpy.transpose(speaker_choice))
 printCP("listener_choice", numpy.transpose(listener_choice))
+printLL(listener_choice)
+
+# define general function
+
+def speaker_choice_FUN(game, lexicon, LAMBDA = 5):
+    sem = semantics(game, lexicon)
+    literal_listener = normalise(numpy.transpose(sem))
+    speaker_choice = normalise(numpy.exp(LAMBDA * numpy.transpose(literal_listener)))
+    return speaker_choice
+
+def listener_choice_FUN(game, lexicon, LAMBDA = 5):
+    sem = semantics(game, lexicon)
+    literal_listener = normalise(numpy.transpose(sem))
+    speaker_choice = normalise(numpy.exp(LAMBDA * numpy.transpose(literal_listener)))
+    listener_choice = normalise(numpy.transpose(speaker_choice))
+    return listener_choice
+
+def get_EU(g, speaker_type, listener_type):
+    # Michael's job
+    pass
+
+## PSEUDO-CODE
+
+expected_utility = MATRIX(0, dim=[no. of lexica, no. of lexica])
+
+
+for speaker_type in range(len(SET_OF_ALL_LEXICA)):
+    for listener_type in range(len(SET_OF_ALL_LEXICA)):
+        for g in games:
+            expected_utility[speaker_type, listener_type] += get_EU(g,
+                                                                  SET_OF_ALL_LEXICA[speaker_type],
+                                                                  SET_OF_ALL_LEXICA[listener_type])
+expected_utility = expected_utility/len(games)
