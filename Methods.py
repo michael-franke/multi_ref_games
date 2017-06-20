@@ -12,8 +12,9 @@ def get_context(LAMBDA, THETA_O, THETA_H, THETA_C, N_O, N_H, N_C):
  
 
 
-def get_lexica(stepsize = 1.0/3):
-    all_lexica = []
+def get_lexica():
+    
+    lexica = []
     o1 = [0.3,0.7]
     h1 = [0.3,0.7]
     c1 = [0.3,0.7]
@@ -23,11 +24,17 @@ def get_lexica(stepsize = 1.0/3):
     c2 = [0.5,0.5]
     
     features = [o1,h1,c1]
-    all_lexica.append(features)
+    lexica.append(features)
     features = [o2,h2,c2]
-    all_lexica.append(features)
+    lexica.append(features)
                             
-    return all_lexica
+    return lexica
+
+def get_all_lexica(nSteps, shape = (3, 2)):
+    c = numpy.prod(shape)
+    x = numpy.linspace(0, 1, nSteps + 1)
+    
+    return numpy.array(numpy.meshgrid(*(x,)*c)).T.reshape((-1, ) + shape)
 
 #def normalize(m): #check this
 #    m = m / m.sum(axis=1)[:, numpy.newaxis]
