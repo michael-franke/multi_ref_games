@@ -16,6 +16,7 @@ N_H = 2
 N_C = 2
 list_of_lexica = []
 #list_of_games = []
+stepSize = 1.0/3.0
 ngames = 1000 # how many games to sample from
 
 
@@ -31,7 +32,7 @@ ngames = 1000 # how many games to sample from
 #                       [0.2,0.6],
 #                       [0.4,0.6]])
 # TO DO: create the set of all possible lexica (using values 0, 0.1, ... 0.9, 1)
-list_of_lexica = Methods.get_lexica()
+list_of_lexica = Methods.get_lexica(stepSize)
 #print("lexica: ", list_of_lexica)
     
 
