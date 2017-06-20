@@ -16,27 +16,26 @@ N_H = 2
 N_C = 2
 list_of_lexica = []
 #list_of_games = []
-stepSize = 1.0/3.0
+nSteps = 3   # this is 1/n 
 ngames = 1000 # how many games to sample from
 
 
 
 
-## LEXICA:
-## for each property type (open, half-open, closed), we have two words (high and low)
-## examples:
-#lexicon_1= numpy.array([[0.9,0.6],
-#                       [0.3,0.7],
-#                       [0.4,0.8]])
-#lexicon_2= numpy.array([[0.3,0.4],
-#                       [0.2,0.6],
-#                       [0.4,0.6]])
-# TO DO: create the set of all possible lexica (using values 0, 0.1, ... 0.9, 1)
-list_of_lexica = Methods.get_lexica(stepSize)
-#print("lexica: ", list_of_lexica)
-    
+### LEXICA - only 2 ###
 
-#code
+#list_of_lexica = Methods.get_lexica()
+
+########
+
+### LEXICA - ALL possible lexica ####
+
+list_of_lexica = Methods.get_all_lexica(nSteps) #WARNING: this takes a LONG time to process in  later methods
+
+################    
+
+
+##### code for ALL games at once #####
 #for game in range(number_of_games):     #for every game create the right amount of certain features
     #context = Methods.get_context(LAMBDA, THETA_O, THETA_H, THETA_C, N_O, N_H, N_C)
     #add the game to the list of games
@@ -69,7 +68,7 @@ list_of_lexica = Methods.get_lexica(stepSize)
 ############
 
 
-
+##### code for sampling games ######
 
 EU = numpy.zeros([len(list_of_lexica), len(list_of_lexica)]) # matrix with zeros of right size
 
