@@ -123,8 +123,19 @@ def listener_choice_FUN(game, lexicon, LAMBDA, N_O, N_H, N_C):
     listener_choice = normalise(numpy.transpose(speaker_choice))
     return listener_choice
 
+def get_speakerlistener_FUN(game, lexicon, LAMBDA, N_O, N_H, N_C):
+    sem = semantics(game, lexicon, N_O, N_H, N_C)
+    literal_listener = normalise(numpy.transpose(sem))
+    speaker_choice = normalise(numpy.exp(LAMBDA * numpy.transpose(literal_listener)))
+    listener_choice = normalise(numpy.transpose(speaker_choice))
+    return [speaker_choice, listener_choice]
+
 def get_EU(g, speaker_lexicon, listener_lexicon, LAMBDA, N_O, N_H, N_C):
     speaker_choice  = speaker_choice_FUN(g,speaker_lexicon, LAMBDA, N_O, N_H, N_C)
     listener_choice = listener_choice_FUN(g, listener_lexicon, LAMBDA, N_O, N_H, N_C)
     EU = numpy.sum(speaker_choice * numpy.transpose(listener_choice)) / len(g)
     return(EU)
+
+def get_EU_behavior(g, speaker_choice, listener_choice):
+    EU = numpy.sum(speaker_choice * numpy.transpose(listener_choice)) / len(g)
+    return (EU)

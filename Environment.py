@@ -16,8 +16,8 @@ N_H = 2
 N_C = 2
 list_of_lexica = []
 #list_of_games = []
-nSteps = 3   # this is 1/n 
-ngames = 1000 # how many games to sample from
+nSteps = 3    # this is 1/n
+ngames = 1000  # how many games to sample from
 
 
 
@@ -31,54 +31,35 @@ ngames = 1000 # how many games to sample from
 ### LEXICA - ALL possible lexica ####
 
 list_of_lexica = Methods.get_all_lexica(nSteps) #WARNING: this takes a LONG time to process in  later methods
+list_of_lexica = list_of_lexica[0:100]
 
 ################    
 
 
-##### code for ALL games at once #####
-#for game in range(number_of_games):     #for every game create the right amount of certain features
-    #context = Methods.get_context(LAMBDA, THETA_O, THETA_H, THETA_C, N_O, N_H, N_C)
-    #add the game to the list of games
-    #list_of_games.append(context)
-
-#print("list of games: ", list_of_games[0])  
-
-#g = random.choice(list_of_games)
-#print("g: ", g)
-
-#Lj = random.choice(list_of_lexica)
-#print("Lj: ", Lj)
-
-#printMethods.printLexica(list_of_lexica)
-#printMethods.printGames(list_of_games)    
-
-#sem = Methods.semantics(g, Lj)
-#printMethods.printSem(sem)
-
-#literal_listener = Methods.normalise(numpy.transpose(sem))
-#printMethods.printLL(literal_listener)
-
-#speaker_choice = Methods.normalise(numpy.exp(LAMBDA * numpy.transpose(literal_listener)))
-#printMethods.printCP("speaker_choice", speaker_choice)
-
-#listener_choice = Methods.normalise(numpy.transpose(speaker_choice))
-#printMethods.printCP("listener_choice", numpy.transpose(listener_choice))
-#printMethods.printLL(listener_choice)
-
-############
-
-
 ##### code for sampling games ######
 
-EU = numpy.zeros([len(list_of_lexica), len(list_of_lexica)]) # matrix with zeros of right size
+# create vector of 'ngames' games/contexts
+games = [Methods.get_context(LAMBDA, THETA_O, THETA_H, THETA_C, N_O, N_H, N_C) for g in range(ngames)]
 
-for s_type in range(len(list_of_lexica)):
-    for l_type in range(len(list_of_lexica)):
-        EU[s_type, l_type] += numpy.mean([Methods.get_EU(Methods.get_context(LAMBDA, THETA_O, THETA_H, THETA_C, N_O, N_H, N_C),
-                                                 list_of_lexica[s_type],
-                                                 list_of_lexica[s_type], 
-                                                 LAMBDA, N_O, N_H, N_C)
-                                          for g in range(ngames)])
+# get a speaker and listener behavior for each of these games for each lexicon
+behavior = [ [ Methods.get_speakerlistener_FUN(game, lexicon, LAMBDA, N_O, N_H, N_C) for game in games]
+                        for lexicon in list_of_lexica]
+
+# matrix with zeros of right size to fill in EU values
+EU = numpy.zeros([len(list_of_lexica), len(list_of_lexica)])
+
+# get EU values
+for lrow in range(len(list_of_lexica)):
+    for lcol in range(len(list_of_lexica)):
+        if lcol < lrow:
+            EU[lrow, lcol] = EU[lcol, lrow] # if we have calculated this before, reuse value
+        else:
+            EU[lrow, lcol] = 0.5 * numpy.mean([ Methods.get_EU_behavior(games[game_index],
+                                                                behavior[lrow][game_index][0],
+                                                                behavior[lcol][game_index][1]) + \
+                                                Methods.get_EU_behavior(games[game_index],
+                                                                behavior[lcol][game_index][0],
+                                                                behavior[lrow][game_index][1])
+                                                for game_index in range(len(games))])
 
 print("EU: ", EU)
-# seems like the first lexicon is doing better than the second
