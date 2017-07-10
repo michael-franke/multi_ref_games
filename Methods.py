@@ -139,3 +139,20 @@ def get_EU(g, speaker_lexicon, listener_lexicon, LAMBDA, N_O, N_H, N_C):
 def get_EU_behavior(g, speaker_choice, listener_choice):
     EU = numpy.sum(speaker_choice * numpy.transpose(listener_choice)) / len(g)
     return (EU)
+
+# get EU values for a single game
+def get_EU(game, list_of_lexica, LAMBDA, N_O, N_H, N_C):
+    EU_local = numpy.zeros([len(list_of_lexica), len(list_of_lexica)])
+    # get a speaker and listener behavior for each of these games for each lexicon
+    behavior = [get_speakerlistener_FUN(game, lexicon, LAMBDA, N_O, N_H, N_C)
+                  for lexicon in list_of_lexica]
+    for lrow in range(len(list_of_lexica)):
+        for lcol in range(len(list_of_lexica)):
+            if lcol < lrow:
+                EU_local[lrow, lcol] = EU_local[lcol, lrow]  # if we have calculated this before, reuse value
+            else:
+                EU_local[lrow, lcol] = 0.5 * (get_EU_behavior(game, behavior[lrow][0],
+                                                                            behavior[lcol][1]) + \
+                                              get_EU_behavior(game, behavior[lcol][0],
+                                                                            behavior[lrow][1]))
+    return EU_local

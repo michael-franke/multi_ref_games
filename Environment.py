@@ -17,7 +17,7 @@ N_C = 2
 list_of_lexica = []
 #list_of_games = []
 nSteps = 3    # this is 1/n
-ngames = 1000  # how many games to sample from
+ngames = 100  # how many games to sample from
 
 
 
@@ -30,36 +30,21 @@ ngames = 1000  # how many games to sample from
 
 ### LEXICA - ALL possible lexica ####
 
-list_of_lexica = Methods.get_all_lexica(nSteps) #WARNING: this takes a LONG time to process in  later methods
-list_of_lexica = list_of_lexica[0:100]
+list_of_lexica = Methods.get_all_lexica(nSteps) #WARNING: this takes a LONG time to process in later methods
 
-################    
+################
 
 
 ##### code for sampling games ######
 
 # create vector of 'ngames' games/contexts
-games = [Methods.get_context(LAMBDA, THETA_O, THETA_H, THETA_C, N_O, N_H, N_C) for g in range(ngames)]
-
-# get a speaker and listener behavior for each of these games for each lexicon
-behavior = [ [ Methods.get_speakerlistener_FUN(game, lexicon, LAMBDA, N_O, N_H, N_C) for game in games]
-                        for lexicon in list_of_lexica]
+# games = [Methods.get_context(LAMBDA, THETA_O, THETA_H, THETA_C, N_O, N_H, N_C) for g in range(ngames)]
 
 # matrix with zeros of right size to fill in EU values
 EU = numpy.zeros([len(list_of_lexica), len(list_of_lexica)])
 
-# get EU values
-for lrow in range(len(list_of_lexica)):
-    for lcol in range(len(list_of_lexica)):
-        if lcol < lrow:
-            EU[lrow, lcol] = EU[lcol, lrow] # if we have calculated this before, reuse value
-        else:
-            EU[lrow, lcol] = 0.5 * numpy.mean([ Methods.get_EU_behavior(games[game_index],
-                                                                behavior[lrow][game_index][0],
-                                                                behavior[lcol][game_index][1]) + \
-                                                Methods.get_EU_behavior(games[game_index],
-                                                                behavior[lcol][game_index][0],
-                                                                behavior[lrow][game_index][1])
-                                                for game_index in range(len(games))])
+for g_count in range(ngames):
+    game = Methods.get_context(LAMBDA, THETA_O, THETA_H, THETA_C, N_O, N_H, N_C)
+    EU += Methods.get_EU(game, list_of_lexica, LAMBDA, N_O, N_H, N_C)/ngames
 
 print("EU: ", EU)
