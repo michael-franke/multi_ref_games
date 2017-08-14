@@ -144,3 +144,50 @@ def printLL(ll):
     string += "====================================================================\n"
     
     print(string)
+    
+    
+    def saveData(i, startTime, list_of_lexica, results, LAMBDA, THETA_O, THETA_H, THETA_C, N_O, N_H, N_C, nStep, ngames):
+        if not os.path.exists(''.join(["C:/Users/Richard Belk/OneDrive/SFS WORK/Reports/"])):
+            os.makedirs(''.join(["C:/Users/Richard Belk/OneDrive/SFS WORK/Reports/"]))
+                     
+        reportfile = ''.join(["C:/Users/Richard Belk/OneDrive/SFS WORK/Reports/report_", datetime.datetime.now().strftime("%y-%m-%d-%H-%M-%S"), ".txt"])
+        reporttxt = "EU REPORT- section: "
+        reporttxt += str(i)
+        reporttxt += "\n"
+        reporttxt += "Runtime: "
+        reporttxt += str("%.4f" % ((time.time() - startTime) / 60))
+        reporttxt += " minutes\n"
+        reporttxt += "LAMBDA: "
+        reporttxt += str(LAMBDA)
+        reporttxt += "\nTHETA_O: "
+        reporttxt += str(THETA_O)
+        reporttxt += "\nTHETA_H: "
+        reporttxt += str(THETA_H)
+        reporttxt += "\nTHETA_C: "
+        reporttxt += str(THETA_C)
+        reporttxt += "\nN_O: "
+        reporttxt += str(N_O)
+        reporttxt += "\nN_H: "
+        reporttxt += str(N_H)
+        reporttxt += "\nN_C: "
+        reporttxt += str(N_C)
+        reporttxt += "\nnStep: "
+        reporttxt += str(nStep)
+        reporttxt += "\nngames: "
+        reporttxt += str(ngames)
+        reporttxt += "\n\n"
+
+        reporttxt += printLexica(list_of_lexica)
+    
+        reporttxt += "\n\nEU\n"
+    
+        #reporttxt +=  (repr(results))
+        for x in results:
+            for y in x:
+                reporttxt += str(y) + "\t"
+            reporttxt += "\n"
+        reporttxt += "\n"
+        
+        text_file = open(reportfile, "w")
+        text_file.write(reporttxt)
+        text_file.close()  
